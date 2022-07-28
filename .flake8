@@ -1,0 +1,3 @@
+[flake8]
+ignore = E501,W503,F403,E203
+exclude = .git,__pycache__,tests/conftest.py,build,dist

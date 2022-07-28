@@ -1,0 +1,53 @@
+{
+  "configurations": {
+    "run": {
+      "adapter": "debugpy",
+       "variables": {
+        "Python": {
+          "shell": "/usr/bin/sh -c /home/dimfred/scripts/run/python3.sh"
+          // "shell": "/usr/bin/sh -c /home/dimfred/scripts/run/python37.sh"
+          // "shell": "/usr/bin/sh -c /home/dimfred/scripts/run/python38.sh"
+          // "shell": "/usr/bin/sh -c /home/dimfred/scripts/run/python39.sh"
+          // "shell": "/usr/bin/sh -c /home/dimfred/scripts/run/python310.sh"
+        }
+      },
+      "configuration": {
+        "type": "python",
+        "autoselect": false,
+        "request": "launch",
+        "stopOnEntry": false,
+        "justMyCode": false,
+        "console": "integratedTerminal",
+
+        "python": "$Python",
+
+        "cwd": "${fileDirname}",
+        "environment": [],
+
+        // "module": "pytest",
+        "program": "${workspaceFolder}/",
+        "args": []
+      },
+      "breakpoints": {
+        "exception": {
+          "raised": "N",
+          "uncaught": "Y"
+        }
+      }
+    }
+    // ,
+    //"attach": {
+    //  "adapter": "multi-session",
+    //  "configuration": {
+    //    "request": "attach"
+    //  },
+    //  "breakpoints": {
+    //    "exception": {
+    //      "raised": "N",
+    //      "uncaught": ""
+    //    }
+    //  }
+    //}
+  }
+}
+// vim:ft=jsonc

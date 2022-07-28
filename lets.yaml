@@ -1,0 +1,27 @@
+shell: zsh
+
+commands:
+  example:
+    description: run example
+    cmd: |
+      python3 -m example.example
+
+  test:
+    description: run the tests
+    cmd: |
+      python3 -m pytest -s -p no:pytest-brownie
+
+  cov:
+    description: run coverage
+    cmd: |
+      python3 -m pytest -s -p no:pytest-brownie \
+        --cov-report term-missing \
+        --cov-config pytest.ini \
+        --cov=. tests/
+
+  env:
+    description: enable venv
+    cmd: |
+      if [ -z $POETRY_ACTIVE ]; then
+        python3 -m poetry shell;
+      fi
