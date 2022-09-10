@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from loguru import logger
 
-from .models.models import Message
+from .models.stream import Message
 from .models.types import EventType
 
 

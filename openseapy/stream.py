@@ -7,10 +7,11 @@ import websockets
 from loguru import logger
 
 from . import utils
-from .models.models import Message
+from .base import OpenSeaBase
+from .event import OpenSeaEvent
+from .event_api import OpenSeaEventAPI
+from .models.stream import Message
 from .models.types import EventType
-from .opensea_api import OpenSeaEventAPI
-from .opensea_event import OpenSeaEvent
 
 
 def with_ws(f):
@@ -24,15 +25,11 @@ def with_ws(f):
     return wrapper
 
 
-class OpenSeaStream(OpenSeaEventAPI, OpenSeaEvent):
-    def __init__(self, api_key="", test=False, log_level="ERROR"):
-        if not test:
-            assert api_key
-
-        super(OpenSeaEventAPI, self).__init__()
-        super(OpenSeaEvent, self).__init__()
-        self._log_level = log_level
-        utils.init_logger(logger, log_level)
+class OpenSeaStream(OpenSeaBase, OpenSeaEvent, OpenSeaEventAPI):
+    def __init__(self, api_key: str, test: bool, log_level: str):
+        OpenSeaBase.__init__(self, api_key, test, log_level)
+        OpenSeaEvent.__init__(self)
+        OpenSeaEventAPI.__init__(self)
 
         testnet = "testnets-" if test else ""
         self.url = (
@@ -40,9 +37,12 @@ class OpenSeaStream(OpenSeaEventAPI, OpenSeaEvent):
         )
         self._keep_alive_interval = 25
 
-        self.worker = utils.Worker()
-        self.worker.push(self._recv_task())
-        self.worker.push(self._keep_alive_task())
+    def init(self, loop=None):
+        if loop is None:
+            loop = asyncio
+
+        loop.create_task(self._recv_task())
+        loop.create_task(self._keep_alive_task())
 
     async def _recv_task(self):
         async with websockets.connect(self.url) as ws:
@@ -53,10 +53,11 @@ class OpenSeaStream(OpenSeaEventAPI, OpenSeaEvent):
                 res = json.loads(res)
                 res["event"] = EventType(res["event"])
 
-                if self._log_level == "DEBUG":
+                if self.log_level == "DEBUG":
                     logger.debug(f"\n{utils.pformat(res)}")
 
                 await self._distribute(res)
+
 
     @with_ws
     async def _keep_alive_task(self):
@@ -68,4 +69,5 @@ class OpenSeaStream(OpenSeaEventAPI, OpenSeaEvent):
 
     @with_ws
     async def _send(self, obj):
+        logger.debug(f"Sending: {obj}")
         await self.ws.send(obj)
