@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import asyncio
+
 from loguru import logger
 
 from .models.stream import Message

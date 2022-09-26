@@ -37,7 +37,7 @@ class OpenSeaStream(OpenSeaBase, OpenSeaEvent, OpenSeaEventAPI):
         )
         self._keep_alive_interval = 25
 
-    def init(self, loop=None):
+    async def start(self, loop=None):
         if loop is None:
             loop = asyncio
 
@@ -56,8 +56,7 @@ class OpenSeaStream(OpenSeaBase, OpenSeaEvent, OpenSeaEventAPI):
                 if self.log_level == "DEBUG":
                     logger.debug(f"\n{utils.pformat(res)}")
 
-                await self._distribute(res)
-
+                asyncio.create_task(self._distribute(res))
 
     @with_ws
     async def _keep_alive_task(self):
