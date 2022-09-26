@@ -17,7 +17,7 @@ class AssetContract(BaseModel):
     name: str
     nft_version: str
     opensea_version: Optional[str]
-    owner: int
+    owner: Optional[int]
     schema_name: str
     symbol: str
     total_supply: Optional[str]
