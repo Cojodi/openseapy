@@ -60,7 +60,9 @@ async def amain():
         sub = True
         while True:
             # the name of the collection
-            await opensea.stream.collection("genesisblockagents", sub=sub)
+            await opensea.stream.collection("*", sub=sub)
+            # or
+            # await opensea.stream.collection("<slug>", sub=sub)
             sub = not sub
             await aioconsole.ainput()
     except KeyboardInterrupt:

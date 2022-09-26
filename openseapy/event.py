@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import asyncio
-
 from loguru import logger
 
 from .models.stream import Message
@@ -15,7 +13,7 @@ class OpenSeaEvent:
         EventType.item_listed: "on_item_listed",
         EventType.item_sold: "on_item_sold",
         EventType.item_transferred: "on_item_transferred",
-        EventType.item_metadata_update: "on_item_metadata_update",
+        EventType.item_metadata_updated: "on_item_metadata_updated",
         EventType.item_cancelled: "on_item_cancelled",
         EventType.item_received_offer: "on_item_received_offer",
         EventType.item_received_bid: "on_item_received_bid",

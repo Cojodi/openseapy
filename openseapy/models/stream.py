@@ -103,7 +103,7 @@ class ItemTransferredEvent(BaseEvent):
     transaction: Transaction
 
 
-class ItemMetadataUpdateEvent(BaseEvent):
+class ItemMetadataUpdatedEvent(BaseEvent):
     name: str
     description: str
     image_preview_url: str
@@ -154,7 +154,7 @@ ItemEvent = Union[
     ItemListedEvent,
     ItemSoldEvent,
     ItemTransferredEvent,
-    ItemMetadataUpdateEvent,
+    ItemMetadataUpdatedEvent,
     ItemCancelledEvent,
     ItemReceivedOfferEvent,
     ItemReceivedBidEvent,
@@ -164,7 +164,7 @@ MESSAGE_MAPPING = {
     EventType.item_listed: ItemListedEvent,
     EventType.item_sold: ItemSoldEvent,
     EventType.item_transferred: ItemTransferredEvent,
-    EventType.item_metadata_update: ItemMetadataUpdateEvent,
+    EventType.item_metadata_updated: ItemMetadataUpdatedEvent,
     EventType.item_cancelled: ItemCancelledEvent,
     EventType.item_received_offer: ItemReceivedOfferEvent,
     EventType.item_received_bid: ItemReceivedBidEvent,

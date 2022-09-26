@@ -13,7 +13,7 @@ class EventType(Enum):
     item_listed = "item_listed"
     item_sold = "item_sold"
     item_transferred = "item_transferred"
-    item_metadata_update = "item_metadata_update"
+    item_metadata_updated = "item_metadata_updated"
     item_cancelled = "item_cancelled"
     item_received_offer = "item_received_offer"
     item_received_bid = "item_received_bid"
