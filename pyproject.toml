@@ -6,11 +6,17 @@ authors = ["Dmitrij Vinokour <dimfred.1337@web.de>"]
 
 [tool.poetry.dependencies]
 python = ">=3.9, <=3.10"
-pydantic = "^1.9.1"
-loguru = "^0.6.0"
 websockets = "9.1"
+httpx = "^0.23.0"
+pydantic = "^1.9.1"
+urlpath = "^1.2.0"
+loguru = "^0.6.0"
 
 [tool.poetry.dev-dependencies]
+pytest = "^7.1.3"
+pytest-asyncio = "^0.19.0"
+pytest-cov = "^3.0.0"
+aioconsole = "^0.5.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
