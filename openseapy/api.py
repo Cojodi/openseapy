@@ -2,13 +2,14 @@
 import asyncio
 import time
 from asyncio import Semaphore
+from typing import List
 
 from httpx import AsyncClient
 from urlpath import URL
 
 from .base import OpenSeaBase
 from .helper import get
-from .models.api import Collection
+from .models.api import Asset, Collection
 
 
 class OpenSeaAPI(OpenSeaBase):
@@ -33,7 +34,7 @@ class OpenSeaAPI(OpenSeaBase):
         self._max_parallel_requests = max_parallel_requests
         self._requests_timeframe_seconds = requests_timeframe_seconds
 
-        self._lock = Semaphore(max_parallel_requests)
+        self._sema = Semaphore(max_parallel_requests)
         self._request_times = []
 
     ################################################################################
@@ -42,6 +43,26 @@ class OpenSeaAPI(OpenSeaBase):
     def collection(self, slug: str):
         url = str(self.v1_url / "collection" / slug)
         return url
+
+    @get(response_model=Asset, key=lambda res: res["assets"])
+    def assets(
+        self,
+        *,
+        owner: str = None,
+        token_ids: List[str] = None,
+        collection: str = None,
+        collection_editor: str = None,
+        order_direction: str = "desc",
+        asset_contract_address: str = None,
+        asset_contract_addresses: List[str] = None,
+        limit: int = 30,
+        cursor: str = None,
+        include_orders: bool = True,
+    ):
+        """https://docs.opensea.io/reference/getting-assets"""
+        url = str(self.v1_url / "assets")
+
+        return url, locals()
 
     ################################################################################
     # UTILS

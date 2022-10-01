@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime as dt
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
@@ -33,7 +33,6 @@ class AssetContract(BaseModel):
     buyer_fee_basis_points: int
     seller_fee_basis_points: int
     payout_address: Optional[Address]
-
 
 
 class AssetStats(BaseModel):
@@ -75,12 +74,8 @@ class PaymentToken(Token):
     usd_price: Optional[float]
 
 
-class Collection(BaseModel):
-    editors: List[Address]
-    payment_tokens: List[PaymentToken]
-    primary_asset_contracts: List[AssetContract]
-    traits: dict
-    stats: AssetStats
+class CollectionBase(BaseModel):
+    traits: Optional[dict]
     banner_image_url: Optional[str]
     chat_url: Optional[str]
     created_date: dt.datetime
@@ -113,3 +108,51 @@ class Collection(BaseModel):
     wiki_url: Optional[str]
     is_nsfw: bool
     fees: AssetFees
+
+
+class Collection(CollectionBase):
+    stats: AssetStats
+    editors: List[Address]
+    payment_tokens: List[PaymentToken]
+    primary_asset_contracts: List[AssetContract]
+
+
+class Owner(BaseModel):
+    user: Optional[str]
+    profile_img_url: Optional[str]
+    address: str
+    config: Optional[str]
+
+
+class Asset(BaseModel):
+    id: int
+    num_sales: int
+    background_color: Optional[str]
+    image_url: Optional[str]
+    image_preview_url: Optional[str]
+    image_thumbnail_url: Optional[str]
+    image_original_url: Optional[str]
+    animation_url: Optional[str]
+    animation_original_url: Optional[str]
+    name: Optional[str]
+    description: Optional[str]
+    external_link: Optional[str]
+    asset_contract: AssetContract
+    permalink: Optional[str]
+    collection: CollectionBase
+    decimals: Optional[int]
+    token_metadata: Optional[dict]
+    seaport_sell_orders: Optional[Any]
+    is_nsfw: bool
+    owner: Owner
+    creator: Owner
+    traits: List[dict]
+    last_sale: Optional[dt.datetime]
+    top_bid: Optional[float]
+    listing_date: Optional[dt.datetime]
+    is_presale: bool
+    transfer_fee: Optional[float]
+    transfer_fee_payment_token: Optional[str]
+    supports_wyvern: bool
+    rarity_data: Optional[Any]
+    token_id: int

@@ -18,4 +18,5 @@ class OpenSea:
         )
 
         if stream:
+            print("stream")
             self.stream = OpenSeaStream(api_key, test, log_level)
