@@ -156,3 +156,18 @@ class Asset(BaseModel):
     supports_wyvern: bool
     rarity_data: Optional[Any]
     token_id: int
+
+
+################################################################################
+# RESPONSES
+class PaginatedResponse(BaseModel):
+    next: Optional[str]
+    previous: Optional[str]
+
+
+class Collections(PaginatedResponse):
+    collections: List[Collection]
+
+
+class Assets(PaginatedResponse):
+    assets: List[Asset]

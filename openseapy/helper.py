@@ -2,11 +2,18 @@
 import asyncio
 from functools import wraps
 
-import aiohttp
 import httpx
 from loguru import logger
 
 from .exceptions import RateLimitError
+
+
+async def paginate(f, *args, **kwargs):
+    cursor = ""
+    while cursor is not None:
+        res = await f(*args, **kwargs, cursor=cursor)
+        cursor = res.next
+        yield res
 
 
 async def linear_retry(self, make_coro):
@@ -15,12 +22,16 @@ async def linear_retry(self, make_coro):
         await self._check_rate_limit()
         try:
             res = await coro
+            res = res.json()
+
+            is_throttled = "detail" in res and "Request was throttled" in res["detail"]
+            has_failed = "success" in res and not res["success"]
+            if is_throttled or has_failed:
+                await asyncio.sleep(i * 0.25)
+                continue
+
             break
-        except (
-            httpx.ConnectError,
-            httpx.ReadError,
-            aiohttp.client_exceptions.ClientOSError,
-        ):
+        except (httpx.ConnectError, httpx.ReadError):
             retry_in = i * 0.25
             logger.debug(f"Failed request, retry in: {retry_in}")
             await asyncio.sleep(retry_in)
@@ -28,7 +39,7 @@ async def linear_retry(self, make_coro):
     return res
 
 
-def get(response_model, key=None):
+def get(response_model):
     ResponseModel = response_model
 
     def deco(f):
@@ -46,24 +57,11 @@ def get(response_model, key=None):
                 url, params = url_and_maybe_params, {}
 
             async with self._sema:
-                async with httpx.AsyncClient():
+                async with httpx.AsyncClient() as client:
                     res = await linear_retry(
                         self,
-                        lambda: self.client.get(
-                            url, params=params, headers=self._headers
-                        ),
+                        lambda: client.get(url, params=params, headers=self._headers),
                     )
-
-            res = res.json()
-            if "success" in res and not res["success"]:
-                return None
-
-            if "Request was throttled" in res:
-                raise RateLimitError()
-
-            res = key(res)
-            if isinstance(res, list):
-                return [ResponseModel(**r) for r in res]
 
             return ResponseModel(**res)
 
@@ -73,7 +71,7 @@ def get(response_model, key=None):
 
 
 # FIXME: broke atm
-def post(response_model, key=None):
+def post(response_model):
     def deco(f):
         @wraps(f)
         async def wrapper(self, *args, **kwargs):
@@ -83,7 +81,6 @@ def post(response_model, key=None):
                 await self._check_rate_limit()
                 res = await self.client.post(url, headers=self._headers)
 
-            res = res.json()
             if "success" in res and not res["success"]:
                 return None
 

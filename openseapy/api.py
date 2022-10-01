@@ -4,12 +4,11 @@ import time
 from asyncio import Semaphore
 from typing import List
 
-from httpx import AsyncClient
 from urlpath import URL
 
 from .base import OpenSeaBase
 from .helper import get
-from .models.api import Asset, Collection
+from .models.api import Collections, Assets
 
 
 class OpenSeaAPI(OpenSeaBase):
@@ -28,8 +27,6 @@ class OpenSeaAPI(OpenSeaBase):
         self.v1_url = self.base_url / "api/v1"
         self.v2_url = self.base_url / "v2"
 
-        self.client = AsyncClient()
-
         # rate limiting
         self._max_parallel_requests = max_parallel_requests
         self._requests_timeframe_seconds = requests_timeframe_seconds
@@ -39,12 +36,12 @@ class OpenSeaAPI(OpenSeaBase):
 
     ################################################################################
     # API
-    @get(response_model=Collection, key=lambda res: res["collection"])
+    @get(response_model=Collections)
     def collection(self, slug: str):
         url = str(self.v1_url / "collection" / slug)
         return url
 
-    @get(response_model=Asset, key=lambda res: res["assets"])
+    @get(response_model=Assets)
     def assets(
         self,
         *,
