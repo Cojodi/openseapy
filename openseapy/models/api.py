@@ -117,8 +117,12 @@ class Collection(CollectionBase):
     primary_asset_contracts: List[AssetContract]
 
 
+class User(BaseModel):
+    username: Optional[str]
+
+
 class Owner(BaseModel):
-    user: Optional[str]
+    user: Optional[User]
     profile_img_url: Optional[str]
     address: str
     config: Optional[str]
@@ -141,10 +145,10 @@ class Asset(BaseModel):
     permalink: Optional[str]
     collection: CollectionBase
     decimals: Optional[int]
-    token_metadata: Optional[dict]
+    token_metadata: Optional[str]
     seaport_sell_orders: Optional[Any]
     is_nsfw: bool
-    owner: Owner
+    owner: Optional[Owner]
     creator: Optional[Owner]
     traits: List[dict]
     last_sale: Optional[dt.datetime]
