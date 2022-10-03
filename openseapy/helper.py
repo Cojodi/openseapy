@@ -23,6 +23,8 @@ async def linear_retry(self, make_coro):
         try:
             res = await coro
             res = res.json()
+            # DEBUG
+            # logger.error(res)
 
             is_throttled = "detail" in res and "Request was throttled" in res["detail"]
             has_failed = "success" in res and not res["success"]
