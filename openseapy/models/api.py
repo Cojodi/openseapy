@@ -15,7 +15,7 @@ class AssetContract(BaseModel):
     asset_contract_type: str
     created_date: dt.datetime
     name: str
-    nft_version: str
+    nft_version: Optional[str]
     opensea_version: Optional[str]
     owner: Optional[int]
     schema_name: str
@@ -145,7 +145,7 @@ class Asset(BaseModel):
     seaport_sell_orders: Optional[Any]
     is_nsfw: bool
     owner: Owner
-    creator: Owner
+    creator: Optional[Owner]
     traits: List[dict]
     last_sale: Optional[dt.datetime]
     top_bid: Optional[float]
