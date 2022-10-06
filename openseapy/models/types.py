@@ -9,6 +9,10 @@ class EventType(Enum):
     reply = "phx_reply"
     close = "phx_close"
 
+    # collection
+    collection_offer = "collection_offer"
+    trait_offer = "trait_offer"
+
     # items
     item_listed = "item_listed"
     item_sold = "item_sold"
@@ -34,3 +38,4 @@ class FloatingPrice(str):
 # TODO types for auction style
 class ListingType(Enum):
     dutch = "dutch"
+    english = "english"

@@ -9,6 +9,9 @@ class OpenSeaEvent:
     EVENT_HANDLER_MAPPING = {
         EventType.reply: "on_reply",
         EventType.close: "on_close",
+        # collection
+        EventType.collection_offer: "on_collection_offer",
+        EventType.trait_offer: "on_trait_offer",
         # item events
         EventType.item_listed: "on_item_listed",
         EventType.item_sold: "on_item_sold",

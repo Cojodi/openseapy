@@ -44,10 +44,10 @@ class ItemMetadata(BaseModel):
 
 
 class Item(BaseModel):
-    chain: Chain
-    metadata: ItemMetadata
-    nft_id: str
-    permalink: str
+    chain: Optional[Chain]
+    metadata: Optional[ItemMetadata]
+    nft_id: Optional[str]
+    permalink: Optional[str]
 
     @property
     def token_id(self):
@@ -79,6 +79,16 @@ class ItemListedEvent(BaseEvent):
     maker: User
     taker: Optional[User]
 
+    @root_validator(pre=True)
+    def f(cls, values):
+        if "listing_type" in values and values["listing_type"] not in (
+            None,
+            "dutch",
+            "english",
+        ):
+            print(values["listing_type"])
+        return values
+
 
 class ItemSoldEvent(BaseEvent):
     item: Item
@@ -88,7 +98,7 @@ class ItemSoldEvent(BaseEvent):
 
     closing_date: dt.datetime
     listing_type: Optional[ListingType]
-    transaction: Transaction
+    transaction: Optional[Transaction]
     is_private: bool
 
     maker: User
@@ -100,7 +110,7 @@ class ItemTransferredEvent(BaseEvent):
     quantity: int
     from_account: User
     to_account: User
-    transaction: Transaction
+    transaction: Optional[Transaction]
 
 
 class ItemMetadataUpdatedEvent(BaseEvent):
@@ -146,6 +156,10 @@ class ItemReceivedBidEvent(BaseEvent):
 
     maker: User
     taker: Optional[User]
+
+
+# TODO collection_offer
+# TODO trait_offer
 
 
 ################################################################################
