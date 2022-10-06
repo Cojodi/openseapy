@@ -68,7 +68,7 @@ class BaseEvent(BaseModel):
 class ItemListedEvent(BaseEvent):
     item: Item
     base_price: Wei
-    payment_token: Token
+    payment_token: Optional[Token]
     quantity: int
 
     expiration_date: dt.datetime
@@ -93,7 +93,7 @@ class ItemListedEvent(BaseEvent):
 class ItemSoldEvent(BaseEvent):
     item: Item
     sale_price: Wei
-    payment_token: Token
+    payment_token: Optional[Token]
     quantity: int
 
     closing_date: dt.datetime
@@ -126,7 +126,7 @@ class ItemMetadataUpdatedEvent(BaseEvent):
 
 class ItemCancelledEvent(BaseEvent):
     item: Item
-    payment_token: Token
+    payment_token: Optional[Token]
     quantity: int
 
     listing_type: Optional[ListingType]
@@ -135,7 +135,7 @@ class ItemCancelledEvent(BaseEvent):
 class ItemReceivedOfferEvent(BaseEvent):
     item: Item
     base_price: Wei
-    payment_token: Token
+    payment_token: Optional[Token]
     quantity: int
 
     created_date: dt.datetime
@@ -148,7 +148,7 @@ class ItemReceivedOfferEvent(BaseEvent):
 class ItemReceivedBidEvent(BaseEvent):
     item: Item
     base_price: Wei
-    payment_token: Token
+    payment_token: Optional[Token]
     quantity: int
 
     created_date: dt.datetime
