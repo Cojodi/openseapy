@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import asyncio
 from functools import wraps
 
 from .models.stream import Message
@@ -16,8 +15,15 @@ def send(f):
 
 
 class OpenSeaEventAPI:
+    subscriptions = set()
+
     @send
     def collection(self, name, sub=True, ref=0):
+        if sub:
+            self.subscriptions.add(name)
+        else:
+            self.subscriptions.remove(name)
+
         req = Message(
             topic=f"collection:{name}",
             event=EventType.subscribe if sub else EventType.unsubscribe,

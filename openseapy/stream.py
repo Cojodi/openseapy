@@ -5,7 +5,7 @@ from functools import wraps
 
 import websockets
 from loguru import logger
-from websockets.exceptions import ConnectionClosedOK
+from websockets.exceptions import ConnectionClosed, ConnectionClosedOK
 
 from . import utils
 from .base import OpenSeaBase
@@ -38,6 +38,8 @@ class OpenSeaStream(OpenSeaBase, OpenSeaEvent, OpenSeaEventAPI):
         )
         self._keep_alive_interval = 25
 
+        self._subscriptions = set
+
     async def start(self, loop=None):
         if loop is None:
             loop = asyncio
@@ -51,6 +53,9 @@ class OpenSeaStream(OpenSeaBase, OpenSeaEvent, OpenSeaEventAPI):
                 async with websockets.connect(self.url) as ws:
                     self.ws = ws
 
+                    for name in self.subscriptions:
+                        await self.collection(name, sub=True)
+
                     while True:
                         res = await ws.recv()
                         res = json.loads(res)
@@ -60,27 +65,34 @@ class OpenSeaStream(OpenSeaBase, OpenSeaEvent, OpenSeaEventAPI):
                             logger.debug(f"\n{utils.pformat(res)}")
 
                         asyncio.create_task(self._distribute(res))
-            except ConnectionClosedOK:
+            except (ConnectionClosedOK, ConnectionClosed):
                 logger.info("Connection closed, reconnection")
             except Exception as e:
                 logger.error("Uncaught exception in recv_task, trace below:")
                 logger.exception(e)
+
+            # reset ws
+            self.ws = None
 
     @with_ws
     async def _keep_alive_task(self):
         msg = Message(topic="phoenix", event=EventType.keep_alive, ref=0).json()
 
         while True:
-            await asyncio.sleep(self._keep_alive_interval)
-            if self.ws is None:
-                continue
+            try:
+                await asyncio.sleep(self._keep_alive_interval)
+                logger.error("Waiting for ws to reconnect... (keep alive)")
+                if self.ws is None:
+                    continue
 
-            await self.ws.send(msg)
+                await self.ws.send(msg)
+            except (ConnectionClosed, ConnectionClosedOK):
+                logger.info("Connection close, reconnection (keep alive)")
 
     @with_ws
     async def _send(self, obj):
         while self.ws is None:
-            logger.error("Waiting for ws to reconnect...")
+            logger.error("Waiting for ws to reconnect... (send)")
             await asyncio.sleep(1)
 
         logger.debug(f"Sending: {obj}")

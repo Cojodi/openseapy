@@ -110,7 +110,7 @@ class CollectionBase(BaseModel):
     fees: AssetFees
 
 
-class Collection(CollectionBase):
+class Collection_(CollectionBase):
     stats: AssetStats
     editors: List[Address]
     payment_tokens: List[PaymentToken]
@@ -170,7 +170,11 @@ class PaginatedResponse(BaseModel):
 
 
 class Collections(PaginatedResponse):
-    collections: List[Collection]
+    collections: List[Collection_]
+
+
+class Collection(BaseModel):
+    collection: Collection_
 
 
 class Assets(PaginatedResponse):

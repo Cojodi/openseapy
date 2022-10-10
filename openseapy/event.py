@@ -47,4 +47,8 @@ class OpenSeaEvent:
         if handler is None:
             return
 
-        await handler(Message(**msg))
+        try:
+            await handler(Message(**msg))
+        except Exception as e:
+            logger.exception(e)
+            logger.error(msg)

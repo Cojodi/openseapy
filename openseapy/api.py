@@ -8,7 +8,7 @@ from urlpath import URL
 
 from .base import OpenSeaBase
 from .helper import get
-from .models.api import Collections, Assets
+from .models.api import Assets, Collection
 
 
 class OpenSeaAPI(OpenSeaBase):
@@ -36,7 +36,7 @@ class OpenSeaAPI(OpenSeaBase):
 
     ################################################################################
     # API
-    @get(response_model=Collections)
+    @get(response_model=Collection)
     def collection(self, slug: str):
         url = str(self.v1_url / "collection" / slug)
         return url
