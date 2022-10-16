@@ -28,17 +28,15 @@ async def linear_retry(self, make_coro):
 
             is_throttled = "detail" in res and "Request was throttled" in res["detail"]
             has_failed = "success" in res and not res["success"]
-            if is_throttled or has_failed:
+            if is_throttled:
                 await asyncio.sleep(i * 0.25)
                 continue
 
-            break
+            return None if has_failed else res
         except (httpx.ConnectError, httpx.ReadError):
             retry_in = i * 0.25
             logger.debug(f"Failed request, retry in: {retry_in}")
             await asyncio.sleep(retry_in)
-
-    return res
 
 
 def get(response_model):
@@ -65,7 +63,7 @@ def get(response_model):
                         lambda: client.get(url, params=params, headers=self._headers),
                     )
 
-            return ResponseModel(**res)
+            return res if res is None else ResponseModel(**res)
 
         return wrapper
 
