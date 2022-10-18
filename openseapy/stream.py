@@ -36,7 +36,7 @@ class OpenSeaStream(OpenSeaBase, OpenSeaEvent, OpenSeaEventAPI):
         self.url = (
             f"wss://{testnet}stream.openseabeta.com/socket/websocket?token={api_key}"
         )
-        self._keep_alive_interval = 25
+        self._keep_alive_interval = 20
 
         self._subscriptions = set
 
@@ -66,9 +66,9 @@ class OpenSeaStream(OpenSeaBase, OpenSeaEvent, OpenSeaEventAPI):
 
                         asyncio.create_task(self._distribute(res))
             except (ConnectionClosedOK, ConnectionClosed):
-                logger.info("Connection closed, reconnection")
+                logger.error("Connection closed, reconnection")
             except Exception as e:
-                logger.error("Uncaught exception in recv_task, trace below:")
+                logger.error("Uncaught exception (receive task), trace below:")
                 logger.exception(e)
 
             # reset ws
@@ -81,13 +81,16 @@ class OpenSeaStream(OpenSeaBase, OpenSeaEvent, OpenSeaEventAPI):
         while True:
             try:
                 await asyncio.sleep(self._keep_alive_interval)
-                logger.error("Waiting for ws to reconnect... (keep alive)")
                 if self.ws is None:
+                    logger.error("Waiting for ws to reconnect... (keep alive)")
                     continue
 
                 await self.ws.send(msg)
             except (ConnectionClosed, ConnectionClosedOK):
-                logger.info("Connection close, reconnection (keep alive)")
+                logger.error("Connection close, reconnection (keep alive)")
+            except Exception as e:
+                logger.error(f"Uncaught exception (keep alive), trace below:")
+                logger.exception(e)
 
     @with_ws
     async def _send(self, obj):

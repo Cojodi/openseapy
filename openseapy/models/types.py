@@ -39,3 +39,4 @@ class FloatingPrice(str):
 class ListingType(Enum):
     dutch = "dutch"
     english = "english"
+    min_price = "min_price"

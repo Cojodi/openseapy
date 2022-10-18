@@ -22,6 +22,8 @@ async def linear_retry(self, make_coro):
         await self._check_rate_limit()
         try:
             res = await coro
+            # TODO check for status_codes instead of items
+
             res = res.json()
             # DEBUG
             # logger.error(res)
