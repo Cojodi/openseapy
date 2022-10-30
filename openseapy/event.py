@@ -36,6 +36,8 @@ class OpenSeaEvent:
 
         self.event_handlers[f.__name__] = f
 
+        return f
+
     async def _distribute(self, msg):
         event = EventType(msg["event"])
         handler_name = self.EVENT_HANDLER_MAPPING.get(event, None)
