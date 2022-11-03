@@ -65,7 +65,16 @@ def get(response_model):
                         lambda: client.get(url, params=params, headers=self._headers),
                     )
 
-            return res if res is None else ResponseModel(**res)
+            if res is None:
+                return res
+
+            try:
+                return ResponseModel(**res)
+            except Exception as e:
+                logger.error(e)
+                logger.exception(e)
+                logger.error(res)
+                raise e
 
         return wrapper
 
