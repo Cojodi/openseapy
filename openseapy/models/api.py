@@ -128,6 +128,11 @@ class Owner(BaseModel):
     config: Optional[str]
 
 
+class SaleStats(BaseModel):
+    # TODO
+    asset: dict
+
+
 class Asset(BaseModel):
     id: int
     num_sales: int
@@ -151,7 +156,7 @@ class Asset(BaseModel):
     owner: Optional[Owner]
     creator: Optional[Owner]
     traits: List[dict]
-    last_sale: Optional[dt.datetime]
+    last_sale: Optional[SaleStats]
     top_bid: Optional[float]
     listing_date: Optional[dt.datetime]
     is_presale: bool
