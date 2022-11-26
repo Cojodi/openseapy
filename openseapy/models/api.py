@@ -159,7 +159,7 @@ class Asset(BaseModel):
     last_sale: Optional[SaleStats]
     top_bid: Optional[float]
     listing_date: Optional[dt.datetime]
-    is_presale: bool
+    is_presale: Optional[bool]
     transfer_fee: Optional[float]
     transfer_fee_payment_token: Optional[str]
     supports_wyvern: bool
