@@ -35,7 +35,12 @@ async def linear_retry(self, make_coro):
                 continue
 
             return None if has_failed else res
-        except (httpx.ConnectError, httpx.ReadError, httpx.ReadTimeout):
+        except (
+            httpx.ConnectError,
+            httpx.ConnectTimeout,
+            httpx.ReadError,
+            httpx.ReadTimeout,
+        ):
             retry_in = i * 0.25
             logger.debug(f"Failed request, retry in: {retry_in}")
             await asyncio.sleep(retry_in)
