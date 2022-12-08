@@ -22,7 +22,10 @@ class OpenSeaEventAPI:
         if sub:
             self.subscriptions.add(name)
         else:
-            self.subscriptions.remove(name)
+            try:
+                self.subscriptions.remove(name)
+            except KeyError:
+                pass
 
         req = Message(
             topic=f"collection:{name}",
