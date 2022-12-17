@@ -5,7 +5,11 @@ from functools import wraps
 
 import websockets
 from loguru import logger
-from websockets.exceptions import ConnectionClosed, ConnectionClosedOK
+from websockets.exceptions import (
+    ConnectionClosed,
+    ConnectionClosedOK,
+    InvalidStatusCode,
+)
 
 from . import utils
 from .base import OpenSeaBase
@@ -65,11 +69,12 @@ class OpenSeaStream(OpenSeaBase, OpenSeaEvent, OpenSeaEventAPI):
                             logger.debug(f"\n{utils.pformat(res)}")
 
                         asyncio.create_task(self._distribute(res))
-            except (ConnectionClosedOK, ConnectionClosed):
+            except (ConnectionClosedOK, ConnectionClosed, InvalidStatusCode):
                 logger.error("Connection closed, reconnection")
             except Exception as e:
                 logger.error("Uncaught exception (receive task), trace below:")
                 logger.exception(e)
+                asyncio.sleep(0.5)
 
             # reset ws
             self.ws = None
