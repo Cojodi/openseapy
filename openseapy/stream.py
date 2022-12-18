@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import asyncio
 import json
+from asyncio.exceptions import TimeoutError
 from functools import wraps
 
 import websockets
@@ -69,12 +70,17 @@ class OpenSeaStream(OpenSeaBase, OpenSeaEvent, OpenSeaEventAPI):
                             logger.debug(f"\n{utils.pformat(res)}")
 
                         asyncio.create_task(self._distribute(res))
-            except (ConnectionClosedOK, ConnectionClosed, InvalidStatusCode):
-                logger.error("Connection closed, reconnection")
+            except (
+                ConnectionClosedOK,
+                ConnectionClosed,
+                InvalidStatusCode,
+                TimeoutError,
+            ):
+                logger.error("Connection closed, reconnection (recv task)")
             except Exception as e:
                 logger.error("Uncaught exception (receive task), trace below:")
                 logger.exception(e)
-                asyncio.sleep(0.5)
+                asyncio.sleep(1)
 
             # reset ws
             self.ws = None
@@ -91,11 +97,17 @@ class OpenSeaStream(OpenSeaBase, OpenSeaEvent, OpenSeaEventAPI):
                     continue
 
                 await self.ws.send(msg)
-            except (ConnectionClosed, ConnectionClosedOK):
+            except (
+                ConnectionClosed,
+                ConnectionClosedOK,
+                InvalidStatusCode,
+                TimeoutError,
+            ):
                 logger.error("Connection close, reconnection (keep alive)")
             except Exception as e:
                 logger.error(f"Uncaught exception (keep alive), trace below:")
                 logger.exception(e)
+                asyncio.sleep(1)
 
     @with_ws
     async def _send(self, obj):
