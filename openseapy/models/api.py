@@ -164,7 +164,7 @@ class Asset(BaseModel):
     transfer_fee_payment_token: Optional[str]
     supports_wyvern: bool
     rarity_data: Optional[Any]
-    token_id: int
+    token_id: str
 
 
 ################################################################################
