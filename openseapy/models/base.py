@@ -1,7 +1,7 @@
 import datetime as dt
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from .types import Address, FloatingPrice
 
@@ -9,14 +9,20 @@ from .types import Address, FloatingPrice
 ################################################################################
 # BASE
 class Collection(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     slug: str
 
 
 class User(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     address: Address
 
 
 class Token(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     address: Address
     decimals: int
     name: Optional[str]
@@ -26,15 +32,21 @@ class Token(BaseModel):
 
 
 class Chain(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     name: str
 
 
 class Transaction(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     hash: str
     timestamp: dt.datetime
 
 
 class ItemMetadata(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     animation_url: Optional[str]
     image_url: Optional[str]
     metadata_url: Optional[str]
@@ -42,6 +54,8 @@ class ItemMetadata(BaseModel):
 
 
 class Item(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     chain: Chain
     metadata: ItemMetadata
     nft_id: str

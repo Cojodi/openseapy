@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 import datetime as dt
 from typing import List, Optional, Union
 
-from pydantic import BaseModel, root_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 
 from .types import Address, EventType, FloatingPrice, ListingType, Wei
 
@@ -14,10 +13,14 @@ class Collection(BaseModel):
 
 
 class User(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     address: Address
 
 
 class Token(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     address: Address
     decimals: int
     # TODO probably FloatingPrice
@@ -28,15 +31,21 @@ class Token(BaseModel):
 
 
 class Chain(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     name: str
 
 
 class Transaction(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     hash: str
     timestamp: dt.datetime
 
 
 class ItemMetadata(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     animation_url: Optional[str]
     image_url: Optional[str]
     metadata_url: Optional[str]
@@ -44,6 +53,8 @@ class ItemMetadata(BaseModel):
 
 
 class Item(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     chain: Optional[Chain]
     metadata: Optional[ItemMetadata]
     nft_id: Optional[str]
@@ -59,6 +70,8 @@ class Item(BaseModel):
 
 
 class BaseEvent(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     collection: Collection
     event_timestamp: dt.datetime
 
@@ -66,6 +79,8 @@ class BaseEvent(BaseModel):
 ################################################################################
 # ITEM
 class ItemListedEvent(BaseEvent):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     item: Item
     base_price: Wei
     payment_token: Optional[Token]
@@ -79,7 +94,7 @@ class ItemListedEvent(BaseEvent):
     maker: User
     taker: Optional[User]
 
-    @root_validator(pre=True)
+    @model_validator(mode="before")
     def f(cls, values):
         if "listing_type" in values and values["listing_type"] not in (
             None,
@@ -91,6 +106,8 @@ class ItemListedEvent(BaseEvent):
 
 
 class ItemSoldEvent(BaseEvent):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     item: Item
     sale_price: Wei
     payment_token: Optional[Token]
@@ -106,6 +123,8 @@ class ItemSoldEvent(BaseEvent):
 
 
 class ItemTransferredEvent(BaseEvent):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     item: Item
     quantity: int
     from_account: User
@@ -114,6 +133,8 @@ class ItemTransferredEvent(BaseEvent):
 
 
 class ItemMetadataUpdatedEvent(BaseEvent):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     name: str
     description: str
     image_preview_url: str
@@ -125,6 +146,8 @@ class ItemMetadataUpdatedEvent(BaseEvent):
 
 
 class ItemCancelledEvent(BaseEvent):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     item: Item
     payment_token: Optional[Token]
     quantity: int
@@ -133,6 +156,8 @@ class ItemCancelledEvent(BaseEvent):
 
 
 class ItemReceivedOfferEvent(BaseEvent):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     item: Item
     base_price: Wei
     payment_token: Optional[Token]
@@ -146,6 +171,8 @@ class ItemReceivedOfferEvent(BaseEvent):
 
 
 class ItemReceivedBidEvent(BaseEvent):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     item: Item
     base_price: Wei
     payment_token: Optional[Token]
@@ -186,12 +213,14 @@ MESSAGE_MAPPING = {
 
 
 class Message(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     topic: str
     event: EventType
     payload: Union[dict, ItemEvent] = {}
     ref: Optional[int]
 
-    @root_validator
+    @model_validator(mode="after")
     def parse_payload(cls, values):
         Cls = MESSAGE_MAPPING.get(values["event"], None)
         if Cls is not None:

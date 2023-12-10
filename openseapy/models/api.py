@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 import datetime as dt
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from .base import Token
 from .types import Address
@@ -11,6 +10,8 @@ from .types import Address
 ################################################################################
 # BASE
 class AssetContract(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     address: Address
     asset_contract_type: str
     created_date: dt.datetime
@@ -36,6 +37,8 @@ class AssetContract(BaseModel):
 
 
 class AssetStats(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     one_day_volume: float
     one_day_change: float
     one_day_sales: int
@@ -63,11 +66,15 @@ class AssetStats(BaseModel):
 
 
 class AssetFees(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     seller_fees: Dict[Address, int]
     opensea_fees: Dict[Address, int]
 
 
 class PaymentToken(Token):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     id: int
     image_url: Optional[str]
     eth_price: Optional[float]
@@ -75,6 +82,8 @@ class PaymentToken(Token):
 
 
 class CollectionBase(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     traits: Optional[dict]
     banner_image_url: Optional[str]
     chat_url: Optional[str]
@@ -111,6 +120,8 @@ class CollectionBase(BaseModel):
 
 
 class Collection_(CollectionBase):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     stats: AssetStats
     editors: List[Address]
     payment_tokens: List[PaymentToken]
@@ -118,10 +129,14 @@ class Collection_(CollectionBase):
 
 
 class User(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     username: Optional[str]
 
 
 class Owner(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     user: Optional[User]
     profile_img_url: Optional[str]
     address: str
@@ -129,11 +144,15 @@ class Owner(BaseModel):
 
 
 class SaleStats(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     # TODO
     asset: dict
 
 
 class Asset(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     id: int
     num_sales: int
     background_color: Optional[str]
@@ -170,17 +189,25 @@ class Asset(BaseModel):
 ################################################################################
 # RESPONSES
 class PaginatedResponse(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     next: Optional[str]
     previous: Optional[str]
 
 
 class Collections(PaginatedResponse):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     collections: List[Collection_]
 
 
 class Collection(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     collection: Collection_
 
 
 class Assets(PaginatedResponse):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     assets: List[Asset]
