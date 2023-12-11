@@ -3,8 +3,6 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
-from .types import Address, FloatingPrice
-
 
 ################################################################################
 # BASE
@@ -17,18 +15,18 @@ class Collection(BaseModel):
 class User(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    address: Address
+    address: str
 
 
 class Token(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    address: Address
+    address: str
     decimals: int
     name: Optional[str]
     symbol: str
-    eth_price: FloatingPrice
-    usd_price: FloatingPrice
+    eth_price: Optional[str]
+    usd_price: Optional[str]
 
 
 class Chain(BaseModel):

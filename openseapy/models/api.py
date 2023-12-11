@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, ConfigDict
 
 from .base import Token
-from .types import Address
 
 
 ################################################################################
@@ -12,8 +11,9 @@ from .types import Address
 class AssetContract(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    address: Address
+    address: str
     asset_contract_type: str
+    chain_identifier: str
     created_date: dt.datetime
     name: str
     nft_version: Optional[str]
@@ -33,7 +33,7 @@ class AssetContract(BaseModel):
     opensea_seller_fee_basis_points: int
     buyer_fee_basis_points: int
     seller_fee_basis_points: int
-    payout_address: Optional[Address]
+    payout_address: Optional[str]
 
 
 class AssetStats(BaseModel):
@@ -68,8 +68,8 @@ class AssetStats(BaseModel):
 class AssetFees(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    seller_fees: Dict[Address, int]
-    opensea_fees: Dict[Address, int]
+    seller_fees: Dict[str, int]
+    opensea_fees: Dict[str, int]
 
 
 class PaymentToken(Token):
@@ -77,14 +77,14 @@ class PaymentToken(Token):
 
     id: int
     image_url: Optional[str]
-    eth_price: Optional[float]
-    usd_price: Optional[float]
+    eth_price: Optional[str]
+    usd_price: Optional[str]
 
 
 class CollectionBase(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    traits: Optional[dict]
+    # traits: Optional[List[dict]]
     banner_image_url: Optional[str]
     chat_url: Optional[str]
     created_date: dt.datetime
@@ -105,9 +105,9 @@ class CollectionBase(BaseModel):
     medium_username: Optional[str]
     name: Optional[str]
     only_proxied_transfers: bool
-    opensea_buyer_fee_basis_points: str
-    opensea_seller_fee_basis_points: str
-    payout_address: Optional[Address]
+    opensea_buyer_fee_basis_points: Optional[str | float | int]
+    opensea_seller_fee_basis_points: Optional[str | float | int]
+    payout_address: Optional[str]
     require_email: bool
     short_description: Optional[str]
     slug: str
@@ -123,7 +123,7 @@ class Collection_(CollectionBase):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     stats: AssetStats
-    editors: List[Address]
+    editors: List[str]
     payment_tokens: List[PaymentToken]
     primary_asset_contracts: List[AssetContract]
 
@@ -178,7 +178,6 @@ class Asset(BaseModel):
     last_sale: Optional[SaleStats]
     top_bid: Optional[float]
     listing_date: Optional[dt.datetime]
-    is_presale: Optional[bool]
     transfer_fee: Optional[float]
     transfer_fee_payment_token: Optional[str]
     supports_wyvern: bool

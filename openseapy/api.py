@@ -1,24 +1,29 @@
-# -*- coding: utf-8 -*-
-import asyncio
-import time
-from asyncio import Semaphore
 from typing import List
 
+import httpx
 from urlpath import URL
 
 from .base import OpenSeaBase
-from .helper import get
-from .models.api import Assets, Collection
+from .utils.rate_limiter import FakeRateLimiter, RateLimiter
+
+
+class Client:
+    async def get(self, url, params=None, headers=None):
+        async with httpx.AsyncClient(headers=headers) as client:
+            return await client.get(url, params=params)
+
+    async def post(self, url, params=None, data=None, headers=None):
+        async with httpx.AsyncClient(headers=headers) as client:
+            return await client.get(url, params=params, data=data)
 
 
 class OpenSeaAPI(OpenSeaBase):
     def __init__(
         self,
         api_key: str,
-        max_parallel_requests: int,
-        requests_timeframe_seconds: int,
         test: bool,
         log_level: str,
+        rate_limiter: RateLimiter = FakeRateLimiter(),
     ):
         super().__init__(api_key, test, log_level)
 
@@ -27,39 +32,54 @@ class OpenSeaAPI(OpenSeaBase):
         self.v1_url = self.base_url / "api/v1"
         self.v2_url = self.base_url / "v2"
 
-        # rate limiting
-        self._max_parallel_requests = max_parallel_requests
-        self._requests_timeframe_seconds = requests_timeframe_seconds
-
-        self._sema = Semaphore(max_parallel_requests)
-        self._request_times = []
+        self.client = Client()
+        self._rate_limiter = rate_limiter
 
     ################################################################################
     # API
-    @get(response_model=Collection)
-    def collection(self, slug: str):
+    async def collection(self, slug: str):
         url = str(self.v1_url / "collection" / slug)
-        return url
+        coro = self.client.get(
+            url,
+            headers=self._headers,
+        )
 
-    @get(response_model=Assets)
-    def assets(
+        return await self._rate_limiter.limit(coro)
+
+    async def assets(
         self,
         *,
-        owner: str = None,
-        token_ids: List[str] = None,
-        collection: str = None,
-        collection_editor: str = None,
+        owner: str | None = None,
+        token_ids: List[str] | None = None,
+        collection: str | None = None,
+        collection_editor: str | None = None,
         order_direction: str = "desc",
-        asset_contract_address: str = None,
-        asset_contract_addresses: List[str] = None,
+        asset_contract_address: str | None = None,
+        asset_contract_addresses: List[str] | None = None,
         limit: int = 30,
-        cursor: str = None,
+        cursor: str | None = None,
         include_orders: bool = True,
     ):
         """https://docs.opensea.io/reference/getting-assets"""
         url = str(self.v1_url / "assets")
+        coro = self.client.get(
+            url,
+            params=dict(
+                owner=owner,
+                token_ids=token_ids,
+                collection=collection,
+                collection_editor=collection_editor,
+                order_direction=order_direction,
+                asset_contract_address=asset_contract_address,
+                asset_contract_addresses=asset_contract_addresses,
+                limit=limit,
+                cursor=cursor,
+                include_orders=include_orders,
+            ),
+            headers=self._headers,
+        )
 
-        return url, locals()
+        return await self._rate_limiter.limit(coro)
 
     ################################################################################
     # UTILS
@@ -70,15 +90,3 @@ class OpenSeaAPI(OpenSeaBase):
             headers = {"X-API-KEY": self.api_key}
 
         return headers
-
-    async def _check_rate_limit(self):
-        now = time.perf_counter()
-        if len(self._request_times) == self._max_parallel_requests:
-            first = self._request_times[0]
-            timeframe = now - first
-            if timeframe < self._requests_timeframe_seconds:
-                await asyncio.sleep(self._requests_timeframe_seconds - timeframe)
-
-            self._request_times = self._request_times[1:] + [time.perf_counter()]
-        else:
-            self._request_times.append(now)

@@ -3,7 +3,7 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from .types import Address, EventType, FloatingPrice, ListingType, Wei
+from .types import EventType, ListingType
 
 
 ################################################################################
@@ -15,19 +15,18 @@ class Collection(BaseModel):
 class User(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    address: Address
+    address: str
 
 
 class Token(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    address: Address
+    address: str
     decimals: int
-    # TODO probably FloatingPrice
     eth_price: str
     name: Optional[str]
     symbol: str
-    usd_price: FloatingPrice
+    usd_price: str
 
 
 class Chain(BaseModel):
@@ -82,7 +81,7 @@ class ItemListedEvent(BaseEvent):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     item: Item
-    base_price: Wei
+    base_price: str
     payment_token: Optional[Token]
     quantity: int
 
@@ -109,7 +108,7 @@ class ItemSoldEvent(BaseEvent):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     item: Item
-    sale_price: Wei
+    sale_price: str
     payment_token: Optional[Token]
     quantity: int
 
@@ -141,7 +140,6 @@ class ItemMetadataUpdatedEvent(BaseEvent):
     animation_url: Optional[str]
     background_color: str
     metadata_url: str
-    # TODO traittype
     traits: List[dict]
 
 
@@ -159,7 +157,7 @@ class ItemReceivedOfferEvent(BaseEvent):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     item: Item
-    base_price: Wei
+    base_price: str
     payment_token: Optional[Token]
     quantity: int
 
@@ -174,7 +172,7 @@ class ItemReceivedBidEvent(BaseEvent):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     item: Item
-    base_price: Wei
+    base_price: str
     payment_token: Optional[Token]
     quantity: int
 
@@ -183,10 +181,6 @@ class ItemReceivedBidEvent(BaseEvent):
 
     maker: User
     taker: Optional[User]
-
-
-# TODO collection_offer
-# TODO trait_offer
 
 
 ################################################################################

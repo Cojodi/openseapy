@@ -22,18 +22,6 @@ class EventType(Enum):
     item_received_bid = "item_received_bid"
 
 
-class Wei(str):
-    pass
-
-
-class Address(str):
-    pass
-
-
-class FloatingPrice(str):
-    pass
-
-
 # TODO types for auction style
 class ListingType(Enum):
     dutch = "dutch"
