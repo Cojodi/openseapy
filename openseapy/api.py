@@ -1,10 +1,35 @@
-from typing import List
+from typing import List, Literal
 
 import httpx
 from urlpath import URL
 
 from .base import OpenSeaBase
 from .utils.rate_limiter import FakeRateLimiter, RateLimiter
+
+Chain = Literal[
+    "arbitrum",
+    "arbitrum_goerli",
+    "arbitrum_nova",
+    "avalanche",
+    "avalanche_fuji",
+    "baobab",
+    "base",
+    "base_goerli",
+    "bsc",
+    "bsctestnet",
+    "ethereum",
+    "goerli",
+    "klaytn",
+    "matic",
+    "mumbai",
+    "optimism",
+    "optimism_goerli",
+    "sepolia",
+    "solana",
+    "soldev",
+    "zora",
+    "zora_testnet",
+]
 
 
 class Client:
@@ -30,7 +55,7 @@ class OpenSeaAPI(OpenSeaBase):
         testnet = "testnets-" if test else ""
         self.base_url = URL(f"https://{testnet}api.opensea.io")
         self.v1_url = self.base_url / "api/v1"
-        self.v2_url = self.base_url / "v2"
+        self.v2_url = self.base_url / "api/v2"
 
         self.client = Client()
         self._rate_limiter = rate_limiter
@@ -81,6 +106,19 @@ class OpenSeaAPI(OpenSeaBase):
             headers=self._headers,
         )
 
+        return await self._rate_limiter.limit(coro)
+
+    async def nft(self, *, contract_address: str, chain: Chain, token_id: str):
+        url = str(
+            self.v2_url
+            / "chain"
+            / chain
+            / "contract"
+            / contract_address
+            / "nfts"
+            / token_id
+        )
+        coro = self.client.get(url, headers=self._headers)
         return await self._rate_limiter.limit(coro)
 
     ################################################################################
