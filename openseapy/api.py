@@ -62,20 +62,22 @@ class OpenSeaAPI(OpenSeaBase):
     ):
         """https://docs.opensea.io/reference/getting-assets"""
         url = str(self.v1_url / "assets")
+        params = {
+            "owner": owner,
+            "token_ids": token_ids,
+            "collection": collection,
+            "collection_editor": collection_editor,
+            "order_direction": order_direction,
+            "asset_contract_address": asset_contract_address,
+            "asset_contract_addresses": asset_contract_addresses,
+            "limit": limit,
+            "cursor": cursor,
+            "include_orders": include_orders,
+        }
+        params = {k: v for k, v in params.items() if v is not None}
         coro = self.client.get(
             url,
-            params=dict(
-                owner=owner,
-                token_ids=token_ids,
-                collection=collection,
-                collection_editor=collection_editor,
-                order_direction=order_direction,
-                asset_contract_address=asset_contract_address,
-                asset_contract_addresses=asset_contract_addresses,
-                limit=limit,
-                cursor=cursor,
-                include_orders=include_orders,
-            ),
+            params=params,
             headers=self._headers,
         )
 
