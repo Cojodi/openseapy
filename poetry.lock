@@ -12,36 +12,22 @@ files = [
 ]
 
 [[package]]
-name = "aioredis"
-version = "2.0.1"
-description = "asyncio (PEP 3156) Redis support"
-optional = false
-python-versions = ">=3.6"
-files = [
-    {file = "aioredis-2.0.1-py3-none-any.whl", hash = "sha256:9ac0d0b3b485d293b8ca1987e6de8658d7dafcca1cddfcd1d506cae8cdebfdd6"},
-    {file = "aioredis-2.0.1.tar.gz", hash = "sha256:eaa51aaf993f2d71f54b70527c440437ba65340588afeb786cd87c55c89cd98e"},
-]
-
-[package.dependencies]
-async-timeout = "*"
-typing-extensions = "*"
-
-[package.extras]
-hiredis = ["hiredis (>=1.0)"]
-
-[[package]]
 name = "aioredis-semaphore"
 version = "0.1.0"
 description = ""
 optional = false
-python-versions = ">=3.8,<4.0"
-files = [
-    {file = "aioredis_semaphore-0.1.0-py3-none-any.whl", hash = "sha256:578732f4f1cf32480aee580180dc5e64d7abc9b86c752622323fa2e02a4c1f4d"},
-    {file = "aioredis_semaphore-0.1.0.tar.gz", hash = "sha256:cdefd3540d5a59ae61ed93c5362bd1fe7c082ad466605150eed8123d0439c11a"},
-]
+python-versions = ">=3.9,<4.0"
+files = []
+develop = false
 
 [package.dependencies]
-aioredis = ">=2.0.1,<3.0.0"
+redis = ">=5.0.1"
+
+[package.source]
+type = "git"
+url = "https://github.com/Cojodi/aioredis-semaphore.git"
+reference = "main"
+resolved_reference = "b1f5f3b2b3046cc553587a4d571dc7882f73879b"
 
 [[package]]
 name = "annotated-types"
@@ -603,6 +589,24 @@ pytest = ">=4.6"
 testing = ["fields", "hunter", "process-tests", "pytest-xdist", "six", "virtualenv"]
 
 [[package]]
+name = "redis"
+version = "5.0.1"
+description = "Python client for Redis database and key-value store"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "redis-5.0.1-py3-none-any.whl", hash = "sha256:ed4802971884ae19d640775ba3b03aa2e7bd5e8fb8dfaed2decce4d0fc48391f"},
+    {file = "redis-5.0.1.tar.gz", hash = "sha256:0dab495cd5753069d3bc650a0dde8a8f9edde16fc5691b689a566eda58100d0f"},
+]
+
+[package.dependencies]
+async-timeout = {version = ">=4.0.2", markers = "python_full_version <= \"3.11.2\""}
+
+[package.extras]
+hiredis = ["hiredis (>=1.0.0)"]
+ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==20.0.1)", "requests (>=2.26.0)"]
+
+[[package]]
 name = "requests"
 version = "2.31.0"
 description = "Python HTTP for Humans."
@@ -802,4 +806,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<4.0"
-content-hash = "42767138658276dcbab8171a213839421fea0e0a5a5d44439d6fdc942ae41473"
+content-hash = "88865384793e01fae17517d8e3eb85e7c1f8136cd867b15c9656829da9fd1edd"
