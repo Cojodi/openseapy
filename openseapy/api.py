@@ -63,7 +63,7 @@ class OpenSeaAPI(OpenSeaBase):
     ################################################################################
     # API
     async def collection(self, slug: str):
-        url = str(self.v1_url / "collection" / slug)
+        url = str(self.v2_url / "collections" / slug)
         coro = self.client.get(
             url,
             headers=self._headers,
