@@ -31,14 +31,31 @@ Chain = Literal[
     "zora_testnet",
 ]
 
+EventType = Literal[
+    "cancel",
+    "order",
+    "sale",
+    "transfer",
+    "redemption",
+]
+
 
 class Client:
-    async def get(self, url, params=None, headers=None):
+    async def get(self, url, params=None, headers=None, exclude_none: bool = False):
         async with httpx.AsyncClient(headers=headers) as client:
+            if exclude_none:
+                params = {k: v for k, v in params.items() if v is not None}
+
             return await client.get(url, params=params)
 
-    async def post(self, url, params=None, data=None, headers=None):
+    async def post(
+        self, url, params=None, data=None, headers=None, exclude_none: bool = False
+    ):
         async with httpx.AsyncClient(headers=headers) as client:
+            if exclude_none:
+                params = {k: v for k, v in params.items() if v is not None}
+                data = {k: v for k, v in data.items() if v is not None}
+
             return await client.get(url, params=params, data=data)
 
 
@@ -64,13 +81,69 @@ class OpenSeaAPI(OpenSeaBase):
     # API
     async def collection(self, slug: str):
         url = str(self.v2_url / "collections" / slug)
-        coro = self.client.get(
-            url,
-            headers=self._headers,
-        )
+        coro = self.client.get(url, headers=self._headers)
 
         return await self._rate_limiter.limit(coro)
 
+    async def collection_stats(self, slug: str):
+        url = str(self.v2_url / "collections" / slug / "stats")
+        coro = self.client.get(url, headers=self._headers)
+
+        return await self._rate_limiter.limit(coro)
+
+    async def nft(self, *, contract_address: str, chain: Chain, token_id: str):
+        url = str(
+            self.v2_url
+            / "chain"
+            / chain
+            / "contract"
+            / contract_address
+            / "nfts"
+            / token_id
+        )
+        coro = self.client.get(url, headers=self._headers)
+        return await self._rate_limiter.limit(coro)
+
+    async def nft_events(
+        self,
+        *,
+        contract_address: str,
+        chain: Chain,
+        token_id: str,
+        after: int | None = None,
+        before: int | None = None,
+        event_type: list[EventType] | None = None,
+        limit: int = 50,
+        next: str | None = None,
+    ):
+        assert 1 <= limit <= 50, "limit exceeded"
+
+        url = str(
+            self.v2_url
+            / "events"
+            / "chain"
+            / chain
+            / "contract"
+            / contract_address
+            / "nfts"
+            / token_id
+        )
+
+        params = {
+            "after": after,
+            "before": before,
+            "event_type": event_type,
+            "limit": limit,
+            "next": next,
+        }
+
+        coro = self.client.get(
+            url, params=params, headers=self._headers, exclude_none=True
+        )
+        return await self._rate_limiter.limit(coro)
+
+    ################################################################################
+    # V1
     async def assets(
         self,
         *,
@@ -106,19 +179,6 @@ class OpenSeaAPI(OpenSeaBase):
             headers=self._headers,
         )
 
-        return await self._rate_limiter.limit(coro)
-
-    async def nft(self, *, contract_address: str, chain: Chain, token_id: str):
-        url = str(
-            self.v2_url
-            / "chain"
-            / chain
-            / "contract"
-            / contract_address
-            / "nfts"
-            / token_id
-        )
-        coro = self.client.get(url, headers=self._headers)
         return await self._rate_limiter.limit(coro)
 
     ################################################################################
