@@ -7,12 +7,18 @@ from loguru import logger
 from .exceptions import RateLimitError
 
 
-async def paginate(f, *args, **kwargs):
+async def paginate(f, *args, cursor_key="next", **kwargs):
     cursor = ""
     while cursor is not None:
-        res = await f(*args, **kwargs, cursor=cursor)
-        cursor = res.json()["next"]
+        kwargs["cursor"] = cursor
+        res = await f(*args, **kwargs)
+        j = res.json()
+
+        cursor = j.get(cursor_key, None)
         yield res
+
+        if cursor is None:
+            return
 
 
 async def linear_retry(self, make_coro):
