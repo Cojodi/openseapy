@@ -11,7 +11,7 @@ async def paginate(f, *args, **kwargs):
     cursor = ""
     while cursor is not None:
         res = await f(*args, **kwargs, cursor=cursor)
-        cursor = res.next
+        cursor = res.json()["next"]
         yield res
 
 

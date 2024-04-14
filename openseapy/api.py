@@ -79,6 +79,12 @@ class OpenSeaAPI(OpenSeaBase):
 
     ################################################################################
     # API
+    async def contract(self, *, contract_address: str, chain: Chain):
+        url = str(self.v2_url / "chain" / chain / "contract" / contract_address)
+        coro = self.client.get(url, headers=self._headers)
+
+        return await self._rate_limiter.limit(coro)
+
     async def collection(self, slug: str):
         url = str(self.v2_url / "collections" / slug)
         coro = self.client.get(url, headers=self._headers)
@@ -104,6 +110,20 @@ class OpenSeaAPI(OpenSeaBase):
         coro = self.client.get(url, headers=self._headers)
         return await self._rate_limiter.limit(coro)
 
+    async def nfts_by_collection(self, slug: str, limit: int = 50, cursor: str = ""):
+        assert 1 <= limit <= 200, "limit exceeded"
+
+        url = str(self.v2_url / "collection" / slug / "nfts")
+
+        params = {
+            "limit": limit,
+            "next": cursor,
+        }
+        coro = self.client.get(
+            url, params=params, headers=self._headers, exclude_none=True
+        )
+        return await self._rate_limiter.limit(coro)
+
     async def nft_events(
         self,
         *,
@@ -114,7 +134,7 @@ class OpenSeaAPI(OpenSeaBase):
         before: int | None = None,
         event_type: list[EventType] | None = None,
         limit: int = 50,
-        next: str | None = None,
+        cursor: str | None = None,
     ):
         assert 1 <= limit <= 50, "limit exceeded"
 
@@ -134,7 +154,7 @@ class OpenSeaAPI(OpenSeaBase):
             "before": before,
             "event_type": event_type,
             "limit": limit,
-            "next": next,
+            "next": cursor,
         }
 
         coro = self.client.get(
