@@ -8,7 +8,7 @@ from .exceptions import RateLimitError
 
 
 async def paginate(f, *args, cursor_key="next", **kwargs):
-    cursor = ""
+    cursor = kwargs.get("cursor", "")
     while cursor is not None:
         kwargs["cursor"] = cursor
         res = await f(*args, **kwargs)
