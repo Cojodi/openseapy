@@ -79,25 +79,27 @@ class OpenSeaAPI(OpenSeaBase):
 
     ################################################################################
     # API
-    async def contract(self, *, contract_address: str, chain: Chain):
+    async def contract(self, *, contract_address: str, chain: Chain) -> httpx.Response:
         url = str(self.v2_url / "chain" / chain / "contract" / contract_address)
         coro = self.client.get(url, headers=self._headers)
 
         return await self._rate_limiter.limit(coro)
 
-    async def collection(self, slug: str):
+    async def collection(self, slug: str) -> httpx.Response:
         url = str(self.v2_url / "collections" / slug)
         coro = self.client.get(url, headers=self._headers)
 
         return await self._rate_limiter.limit(coro)
 
-    async def collection_stats(self, slug: str):
+    async def collection_stats(self, slug: str) -> httpx.Response:
         url = str(self.v2_url / "collections" / slug / "stats")
         coro = self.client.get(url, headers=self._headers)
 
         return await self._rate_limiter.limit(coro)
 
-    async def nft(self, *, contract_address: str, chain: Chain, token_id: str):
+    async def nft(
+        self, *, contract_address: str, chain: Chain, token_id: str
+    ) -> httpx.Response:
         url = str(
             self.v2_url
             / "chain"
@@ -110,7 +112,9 @@ class OpenSeaAPI(OpenSeaBase):
         coro = self.client.get(url, headers=self._headers)
         return await self._rate_limiter.limit(coro)
 
-    async def nfts_by_collection(self, slug: str, limit: int = 50, cursor: str = ""):
+    async def nfts_by_collection(
+        self, slug: str, limit: int = 50, cursor: str = ""
+    ) -> httpx.Response:
         assert 1 <= limit <= 200, "limit exceeded"
 
         url = str(self.v2_url / "collection" / slug / "nfts")
@@ -135,7 +139,7 @@ class OpenSeaAPI(OpenSeaBase):
         event_type: list[EventType] | None = None,
         limit: int = 50,
         cursor: str | None = None,
-    ):
+    ) -> httpx.Response:
         assert 1 <= limit <= 50, "limit exceeded"
 
         url = str(
@@ -177,7 +181,7 @@ class OpenSeaAPI(OpenSeaBase):
         limit: int = 30,
         cursor: str | None = None,
         include_orders: bool = True,
-    ):
+    ) -> httpx.Response:
         """https://docs.opensea.io/reference/getting-assets"""
         url = str(self.v1_url / "assets")
         params = {
