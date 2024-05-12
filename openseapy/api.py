@@ -128,6 +128,22 @@ class OpenSeaAPI(OpenSeaBase):
         )
         return await self._rate_limiter.limit(coro)
 
+    async def nfts_by_account(
+        self, chain: Chain, account: str, limit: int = 200, cursor: str = ""
+    ) -> httpx.Response:
+        assert 1 <= limit <= 200, "limit exceeded"
+
+        url = str(self.v2_url / "chain" / chain / "account" / account / "nfts")
+
+        params = {
+            "limit": limit,
+            "next": cursor,
+        }
+        coro = self.client.get(
+            url, params=params, headers=self._headers, exclude_none=True
+        )
+        return await self._rate_limiter.limit(coro)
+
     async def nft_events(
         self,
         *,
